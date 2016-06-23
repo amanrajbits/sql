@@ -1,0 +1,48 @@
+USE [Mettl]
+GO
+
+/****** Object:  UserDefinedFunction [dbo].[udf_Split]    Script Date: 23/06/2016 05:40:53 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+CREATE FUNCTION [dbo].[udf_Split]
+(
+	@input		Varchar(4000),
+	@separator	char
+	
+) 
+RETURNS 
+      @Result TABLE(Value VARCHAR(50), Ord INT) 
+AS 
+BEGIN 
+
+      DECLARE @str VARCHAR(20) 
+      DECLARE @ind Int 
+      DECLARE @ord Int
+      SET @ord = 1;
+
+      IF(@input is not null) 
+      BEGIN 
+            SET @ind = CharIndex(@separator,@input) 
+            WHILE @ind > 0 
+            BEGIN 
+                  SET @str = SUBSTRING(@input,1,@ind-1) 
+                  SET @input = SUBSTRING(@input,@ind+1,LEN(@input)-@ind) 
+                  INSERT INTO @Result values (@str, @ord) 
+                  SET @ind = CharIndex(@separator,@input) 
+                  SET @ord = @ord+1
+            END 
+
+            SET @str = @input 
+            INSERT INTO @Result values (@str, @ord) 
+
+      END 
+      RETURN 
+END
+
+GO
+
+
