@@ -1,0 +1,36 @@
+USE [Mettl]
+GO
+/****** Object:  UserDefinedFunction [dbo].[Split]    Script Date: 23/06/2016 05:44:45 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER FUNCTION [dbo].[Split](@input AS nvarchar(max) ) 
+RETURNS 
+      @Result TABLE(Value NVARCHAR(MAX), Ord INT) 
+AS 
+BEGIN 
+
+      DECLARE @str NVARCHAR(MAX) 
+      DECLARE @ind Int 
+      DECLARE @ord Int
+      SET @ord = 1;
+
+      IF(@input is not null) 
+      BEGIN 
+            SET @ind = CharIndex(',',@input) 
+            WHILE @ind > 0 
+            BEGIN 
+                  SET @str = SUBSTRING(@input,1,@ind-1) 
+                  SET @input = SUBSTRING(@input,@ind+1,LEN(@input)-@ind) 
+                  INSERT INTO @Result values (@str, @ord) 
+                  SET @ind = CharIndex(',',@input) 
+                  SET @ord = @ord+1
+            END 
+
+            SET @str = @input 
+            INSERT INTO @Result values (@str, @ord) 
+
+      END 
+      RETURN 
+END
